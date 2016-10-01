@@ -10,6 +10,8 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"mime"
+	"strings"
 )
 
 func IIIFImageToGolangImage(im Image) (image.Image, error) {
@@ -161,4 +163,25 @@ func GolangImageToGolangImage(im image.Image, source_content_type string, dest_c
 	}
 
 	return converted, nil
+}
+
+func ImageFormatToContentType(format string) (string, error) {
+
+	format = strings.TrimLeft(format, ".")
+	format = fmt.Sprintf(".%s", format)
+
+	content_type := mime.TypeByExtension(format)
+	return content_type, nil
+}
+
+func ContentTypeToImageFormat(content_type string) (string, error) {
+
+	possible, err := mime.ExtensionsByType(content_type)
+
+	if err != nil {
+		return "", err
+	}
+
+	first := possible[0]
+	return first, nil
 }

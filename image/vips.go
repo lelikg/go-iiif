@@ -121,22 +121,9 @@ func (im *VIPSImage) Format() string {
 func (im *VIPSImage) ContentType() string {
 
 	format := im.Format()
+	content_type, _ := ImageFormatToContentType(format)
 
-	if format == "jpg" || format == "jpeg" {
-		return "image/jpeg"
-	} else if format == "png" {
-		return "image/png"
-	} else if format == "webp" {
-		return "image/webp"
-	} else if format == "svg" {
-		return "image/svg+xml"
-	} else if format == "tif" || format == "tiff" {
-		return "image/tiff"
-	} else if format == "gif" {
-		return "image/gif"
-	} else {
-		return ""
-	}
+	return content_type
 }
 
 func (im *VIPSImage) Identifier() string {

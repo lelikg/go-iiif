@@ -86,7 +86,10 @@ func (im *BILDImage) Format() string {
 
 func (im *BILDImage) ContentType() string {
 
-	return ""
+	format := im.Format()
+	content_type, _ := ImageFormatToContentType(format)
+
+	return content_type
 }
 
 func (im *BILDImage) Identifier() string {
@@ -177,7 +180,10 @@ func (im *BILDImage) Transform(t *Transformation) error {
 
 	if fi.Format != im.ContentType() {
 
-		converted, err := GolangImageToGolangImage(im.image, im.ContentType(), fi.Format)
+		source_content_type := im.ContentType()
+		dest_content_type, _ := ImageFormatToContentType(fi.Format)
+
+		converted, err := GolangImageToGolangImage(im.image, source_content_type, dest_content_type)
 
 		if err != nil {
 			return nil
