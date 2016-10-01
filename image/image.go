@@ -75,7 +75,9 @@ func NewImageFromConfigWithSource(config *iiifconfig.Config, source iiifsource.S
 
 	if config.Graphics.Source.Name == "VIPS" {
 		return NewVIPSImageFromConfigWithSource(config, source, id)
+	} else if config.Graphics.Source.Name == "BILD" {
+		return NewBILDImageFromConfigWithSource(config, source, id)
+	} else {
+		return nil, errors.New("Unknown graphics source")
 	}
-
-	return nil, errors.New("Unknown graphics source")
 }

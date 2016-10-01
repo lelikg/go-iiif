@@ -2,11 +2,13 @@ package image
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/anthonynsimon/bild/effect"
 	"github.com/anthonynsimon/bild/transform"
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	iiifsource "github.com/thisisaaronland/go-iiif/source"
 	"image"
+	_ "log"
 )
 
 type BILDImage struct {
@@ -22,6 +24,11 @@ type BILDImage struct {
 type BILDDimensions struct {
 	Dimensions
 	bounds image.Rectangle
+}
+
+func (dims *BILDDimensions) String() string {
+
+	return fmt.Sprintf("%d x %d", dims.Width(), dims.Height())
 }
 
 func (dims *BILDDimensions) Height() int {
@@ -116,6 +123,10 @@ func (im *BILDImage) Dimensions() (Dimensions, error) {
 
 func (im *BILDImage) Transform(t *Transformation) error {
 
+	// If I return nil here it works but if try to transform anything
+	// below I get malformed image errors. No idea yet...
+	// (21061001/thisisaaronland)
+
 	if t.Region != "full" {
 
 		rgi, err := t.RegionInstructions(im)
@@ -178,7 +189,11 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		return nil
 	}
 
-	if fi.Format != im.ContentType() {
+	ct, _ := ImageFormatToContentType(fi.Format)
+
+	if ct != im.ContentType() {
+
+		// this doesn't work yet (20161001/thisisaaronland)
 
 		source_content_type := im.ContentType()
 		dest_content_type, _ := ImageFormatToContentType(fi.Format)
