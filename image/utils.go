@@ -110,3 +110,55 @@ func GolangImageToBytes(goimg image.Image, content_type string) ([]byte, error) 
 
 	return out.Bytes(), nil
 }
+
+func BytesToGolangImage(body []byte, content_type string) (image.Image, error) {
+
+	var goimg image.Image
+	var err error
+
+	buf := bytes.NewBuffer(body)
+
+	if content_type == "image/gif" {
+
+		err = gif.Encode(buf, goimg, nil)
+
+	} else if content_type == "image/jpeg" {
+
+		err = jpeg.Encode(buf, goimg, nil)
+
+	} else if content_type == "image/png" {
+
+		err = png.Encode(buf, goimg)
+
+	} else if content_type == "image/tiff" {
+
+		err = tiff.Encode(buf, goimg, nil)
+
+	} else {
+		msg := fmt.Sprintf("Unsupported content type '%s' for decoding", content_type)
+		err = errors.New(msg)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return goimg, nil
+}
+
+func GolangImageToGolangImage(im image.Image, source_content_type string, dest_content_type string) (image.Image, error) {
+
+	body, err := GolangImageToBytes(im, source_content_type)
+
+	if err != nil {
+		return nil, err
+	}
+
+	converted, err := BytesToGolangImage(body, dest_content_type)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return converted, nil
+}

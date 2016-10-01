@@ -2,6 +2,7 @@ package image
 
 import (
 	"bytes"
+	"github.com/anthonynsimon/bild/effect"
 	"github.com/anthonynsimon/bild/transform"
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	iiifsource "github.com/thisisaaronland/go-iiif/source"
@@ -138,10 +139,51 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.image = resized
 	}
 
-	_, err := t.RotationInstructions(im)
+	ri, err := t.RotationInstructions(im)
 
 	if err != nil {
 		return nil
+	}
+
+	if ri.Angle != 0 {
+
+		opts := &transform.RotationOptions{ResizeBounds: false, Pivot: nil}
+		angle := float64(ri.Angle)
+
+		rotated := transform.Rotate(im.image, angle, opts)
+		im.image = rotated
+	}
+
+	if t.Quality == "color" || t.Quality == "default" {
+		// do nothing.
+	} else if t.Quality == "gray" {
+
+		grey := effect.Grayscale(im.image)
+		im.image = grey
+
+	} else if t.Quality == "bitonal" {
+
+		// how to do this in bild? (20160930/thisisaaronland)
+
+	} else {
+		// this should be trapped above
+	}
+
+	fi, err := t.FormatInstructions(im)
+
+	if err != nil {
+		return nil
+	}
+
+	if fi.Format != im.ContentType() {
+
+		converted, err := GolangImageToGolangImage(im.image, im.ContentType(), fi.Format)
+
+		if err != nil {
+			return nil
+		}
+
+		im.image = converted
 	}
 
 	return nil
