@@ -125,6 +125,8 @@ func (im *BILDImage) Dimensions() (Dimensions, error) {
 
 func (im *BILDImage) Transform(t *Transformation) error {
 
+	// to do : http://localhost:8082/full-300.png/pct:41.6,7.5,66.6,100/full/0/color.png
+
 	if t.Region != "full" {
 
 		rgi, err := t.RegionInstructions(im)
@@ -139,6 +141,8 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.image = crop
 	}
 
+	// seems to work
+
 	if t.Size != "max" && t.Size != "full" {
 
 		si, err := t.SizeInstructions(im)
@@ -150,6 +154,8 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		resized := transform.Resize(im.image, si.Width, si.Height, transform.Linear)
 		im.image = resized
 	}
+
+	// to do
 
 	ri, err := t.RotationInstructions(im)
 
@@ -166,6 +172,8 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.image = rotated
 	}
 
+	// to do
+
 	if t.Quality == "color" || t.Quality == "default" {
 		// do nothing.
 	} else if t.Quality == "gray" {
@@ -181,6 +189,8 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		// this should be trapped above
 	}
 
+	// to do - make this work; currently causes go to panic like crazy
+
 	fi, err := t.FormatInstructions(im)
 
 	if err != nil {
@@ -190,8 +200,6 @@ func (im *BILDImage) Transform(t *Transformation) error {
 	ct, _ := ImageFormatToContentType(fi.Format)
 
 	if ct != im.ContentType() {
-
-		// this doesn't work yet (20161001/thisisaaronland)
 
 		source_content_type := im.ContentType()
 		dest_content_type, _ := ImageFormatToContentType(fi.Format)
@@ -204,6 +212,8 @@ func (im *BILDImage) Transform(t *Transformation) error {
 
 		im.image = converted
 	}
+
+	// to do - custom features...
 
 	return nil
 }
