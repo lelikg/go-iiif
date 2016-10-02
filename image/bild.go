@@ -1,5 +1,7 @@
 package image
 
+// https://github.com/anthonynsimon/bild/
+
 import (
 	"bytes"
 	"fmt"
@@ -8,7 +10,7 @@ import (
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	iiifsource "github.com/thisisaaronland/go-iiif/source"
 	"image"
-	_ "log"
+	"log"
 )
 
 type BILDImage struct {

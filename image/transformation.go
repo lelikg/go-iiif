@@ -349,9 +349,13 @@ func (t *Transformation) SizeInstructions(im Image) (*SizeInstruction, error) {
 			}
 
 		} else if err_h != nil {
+
+			// https://github.com/thisisaaronland/go-iiif/issues/31
 			w = int(wi)
 			h = 0
 		} else {
+
+			// https://github.com/thisisaaronland/go-iiif/issues/31
 			w = 0
 			h = int(hi)
 		}
