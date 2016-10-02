@@ -35,12 +35,12 @@ func (dims *BILDDimensions) String() string {
 
 func (dims *BILDDimensions) Height() int {
 
-	return dims.bounds.Max.X
+	return dims.bounds.Max.Y
 }
 
 func (dims *BILDDimensions) Width() int {
 
-	return dims.bounds.Max.Y
+	return dims.bounds.Max.X
 }
 
 func NewBILDImageFromConfigWithSource(config *iiifconfig.Config, src iiifsource.Source, id string) (*BILDImage, error) {
@@ -125,10 +125,6 @@ func (im *BILDImage) Dimensions() (Dimensions, error) {
 
 func (im *BILDImage) Transform(t *Transformation) error {
 
-	// If I return nil here it works but if try to transform anything
-	// below I get malformed image errors. No idea yet...
-	// (21061001/thisisaaronland)
-
 	if t.Region != "full" {
 
 		rgi, err := t.RegionInstructions(im)
@@ -137,7 +133,7 @@ func (im *BILDImage) Transform(t *Transformation) error {
 			return err
 		}
 
-		box := image.Rect(rgi.X, rgi.Y, rgi.Width, rgi.Height)
+		box := image.Rect(rgi.X, rgi.Y, rgi.X+rgi.Width, rgi.Y+rgi.Height)
 		crop := transform.Crop(im.image, box)
 
 		im.image = crop

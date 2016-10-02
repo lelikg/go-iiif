@@ -19,6 +19,10 @@ type RegionInstruction struct {
 	Width  int
 }
 
+func (rgi RegionInstruction) String() string {
+	return fmt.Sprintf("[region] from %d, %d by %d, %d pixels to %d, %d", rgi.X, rgi.Y, rgi.Width, rgi.Height, rgi.X+rgi.Width, rgi.Y+rgi.Height)
+}
+
 type SizeInstruction struct {
 	Height  int
 	Width   int
@@ -361,7 +365,7 @@ func (t *Transformation) SizeInstructions(im Image) (*SizeInstruction, error) {
 			height := dims.Height()
 
 			w = int(wi)
-			h = width * w / height
+			h = height * w / width
 
 		} else {
 
@@ -369,7 +373,7 @@ func (t *Transformation) SizeInstructions(im Image) (*SizeInstruction, error) {
 			height := dims.Height()
 
 			h = int(hi)
-			w = height * h / width
+			w = width * h / height
 
 		}
 
