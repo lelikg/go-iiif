@@ -10,7 +10,7 @@ import (
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	iiifsource "github.com/thisisaaronland/go-iiif/source"
 	"image"
-	"log"
+	_ "log"
 )
 
 type BILDImage struct {

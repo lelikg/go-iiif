@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	iiiflevel "github.com/thisisaaronland/go-iiif/level"
+	_ "log"
 	"math"
 	"net/url"
 	"regexp"
@@ -311,6 +312,12 @@ func (t *Transformation) RegionInstructions(im Image) (*RegionInstruction, error
 
 func (t *Transformation) SizeInstructions(im Image) (*SizeInstruction, error) {
 
+	dims, err := im.Dimensions()
+
+	if err != nil {
+		return nil, err
+	}
+
 	sizeError := "IIIF 2.1 `size` argument is not recognized: %#v"
 
 	w := 0
@@ -350,14 +357,20 @@ func (t *Transformation) SizeInstructions(im Image) (*SizeInstruction, error) {
 
 		} else if err_h != nil {
 
-			// https://github.com/thisisaaronland/go-iiif/issues/31
+			width := dims.Width()
+			height := dims.Height()
+
 			w = int(wi)
-			h = 0
+			h = width * w / height
+
 		} else {
 
-			// https://github.com/thisisaaronland/go-iiif/issues/31
-			w = 0
+			width := dims.Width()
+			height := dims.Height()
+
 			h = int(hi)
+			w = height * h / width
+
 		}
 
 		instruction := SizeInstruction{
