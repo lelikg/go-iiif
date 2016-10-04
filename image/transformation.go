@@ -32,7 +32,11 @@ type SizeInstruction struct {
 
 type RotationInstruction struct {
 	Flip  bool
-	Angle int64
+	Angle float64
+}
+
+func (ri RotationInstruction) String() string {
+	return fmt.Sprintf("[rotation] by %.3f, flip: %t", ri.Angle, ri.Flip)
 }
 
 type FormatInstruction struct {
@@ -429,7 +433,9 @@ func (t *Transformation) RotationInstructions(im Image) (*RotationInstruction, e
 	rotationError := "IIIF 2.1 `rotation` argument is not recognized: %#v"
 
 	flip := strings.HasPrefix(t.Rotation, "!")
-	angle, err := strconv.ParseInt(strings.Trim(t.Rotation, "!"), 10, 64)
+	rotation := strings.Trim(t.Rotation, "!")
+
+	angle, err := strconv.ParseFloat(rotation, 64)
 
 	if err != nil {
 		message := fmt.Sprintf(rotationError, t.Rotation)

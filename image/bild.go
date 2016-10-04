@@ -141,7 +141,7 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.image = crop
 	}
 
-	// seems to work
+	// seems to work (20161002/thisisaaronland)
 
 	if t.Size != "max" && t.Size != "full" {
 
@@ -155,7 +155,7 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.image = resized
 	}
 
-	// to do
+	// seems to work (20161024/thisisaaronland)
 
 	ri, err := t.RotationInstructions(im)
 
@@ -163,9 +163,14 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		return nil
 	}
 
+	if ri.Flip {
+		flipped := transform.FlipH(im.image)
+		im.image = flipped
+	}
+
 	if ri.Angle != 0 {
 
-		opts := &transform.RotationOptions{ResizeBounds: false, Pivot: nil}
+		opts := &transform.RotationOptions{ResizeBounds: true, Pivot: nil}
 		angle := float64(ri.Angle)
 
 		rotated := transform.Rotate(im.image, angle, opts)

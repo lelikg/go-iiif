@@ -251,7 +251,7 @@ func (im *VIPSImage) Transform(t *Transformation) error {
 	}
 
 	opts.Flip = ri.Flip
-	opts.Rotate = bimg.Angle(ri.Angle % 360)
+	opts.Rotate = bimg.Angle(int(ri.Angle) % 360)
 
 	if t.Quality == "color" || t.Quality == "default" {
 		// do nothing.

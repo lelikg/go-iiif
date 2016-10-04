@@ -7,6 +7,8 @@ import (
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	_ "log"
 	"regexp"
+	"strconv"
+	"strings"
 )
 
 // http://iiif.io/api/image/2.1/
@@ -33,8 +35,8 @@ var level2_spec = `{
 	     "rotation": {
 	     		"none":              { "syntax": "0",          "required": true, "supported": true, "match": "^0$" },
 	     		"rotationBy90s":     { "syntax": "90,180,270", "required": true, "supported": true, "match": "^(?:90|180|270)$" },
-	     		"rotationArbitrary": { "syntax": "",           "required": false, "supported": true, "match": "^\\d+\\.\\d+$" },			
-	     		"mirroring":         { "syntax": "!n",         "required": true, "supported": true, "match": "^\\!\\d+$" }
+	     		"rotationArbitrary": { "syntax": "",           "required": false, "supported": true, "match": "^\\d+(\\.\\d+)?$" },			
+	     		"mirroring":         { "syntax": "!n",         "required": true, "supported": true, "match": "^\\!\\d+(\\.\\d+)?$" }
 	     },
 	     "quality": {
 	     		"default": { "syntax": "default", "required": true, "supported": true, "match": "^default$", "default": false },
@@ -212,7 +214,24 @@ func (c *Level2Compliance) IsValidImageSize(size string) (bool, error) {
 
 func (c *Level2Compliance) IsValidImageRotation(rotation string) (bool, error) {
 
-	return c.isvalid("rotation", rotation)
+	_, err := c.isvalid("rotation", rotation)
+
+	if err != nil {
+		return false, err
+	}
+
+	rotation = strings.Trim(rotation, "!")
+	angle, err := strconv.ParseFloat(rotation, 64)
+
+	if err != nil {
+		return false, err
+	}
+
+	if angle > 360.0 {
+		return false, errors.New("Impossible angle")
+	}
+
+	return true, nil
 }
 
 func (c *Level2Compliance) IsValidImageQuality(quality string) (bool, error) {
