@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/anthonynsimon/bild/effect"
+	"github.com/anthonynsimon/bild/segment"
 	"github.com/anthonynsimon/bild/transform"
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	iiifsource "github.com/thisisaaronland/go-iiif/source"
@@ -125,6 +126,8 @@ func (im *BILDImage) Dimensions() (Dimensions, error) {
 
 func (im *BILDImage) Transform(t *Transformation) error {
 
+	// http://iiif.io/api/image/2.1/#order-of-implementation
+
 	// to do : http://localhost:8082/full-300.png/pct:41.6,7.5,66.6,100/full/0/color.png
 
 	if t.Region != "full" {
@@ -155,7 +158,7 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.image = resized
 	}
 
-	// seems to work (20161024/thisisaaronland)
+	// seems to work (20161004/thisisaaronland)
 
 	ri, err := t.RotationInstructions(im)
 
@@ -177,7 +180,8 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.image = rotated
 	}
 
-	// to do
+	// seems to work - not sure how best to define the threshold value
+	// for bitonal images... (20161004/thisisaaronland)
 
 	if t.Quality == "color" || t.Quality == "default" {
 		// do nothing.
@@ -188,7 +192,8 @@ func (im *BILDImage) Transform(t *Transformation) error {
 
 	} else if t.Quality == "bitonal" {
 
-		// how to do this in bild? (20160930/thisisaaronland)
+		bw := segment.Threshold(im.image, 160)
+		im.image = bw
 
 	} else {
 		// this should be trapped above

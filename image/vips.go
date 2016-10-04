@@ -173,6 +173,7 @@ func (im *VIPSImage) Dimensions() (Dimensions, error) {
 
 func (im *VIPSImage) Transform(t *Transformation) error {
 
+	// http://iiif.io/api/image/2.1/#order-of-implementation
 	var opts bimg.Options
 
 	if t.Region != "full" {
