@@ -10,6 +10,7 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	_ "log"
 	"mime"
 	"strings"
 )
@@ -113,56 +114,47 @@ func GolangImageToBytes(goimg image.Image, content_type string) ([]byte, error) 
 	return out.Bytes(), nil
 }
 
-func BytesToGolangImage(body []byte, content_type string) (image.Image, error) {
+func GolangImageToGolangImage(im image.Image, content_type string) (image.Image, string, error) {
 
 	var goimg image.Image
 	var err error
 
-	buf := bytes.NewBuffer(body)
+	buf := new(bytes.Buffer)
 
 	if content_type == "image/gif" {
 
-		err = gif.Encode(buf, goimg, nil)
+		err = gif.Encode(buf, im, nil)
 
 	} else if content_type == "image/jpeg" {
 
-		err = jpeg.Encode(buf, goimg, nil)
+		err = jpeg.Encode(buf, im, nil)
 
 	} else if content_type == "image/png" {
 
-		err = png.Encode(buf, goimg)
+		err = png.Encode(buf, im)
 
 	} else if content_type == "image/tiff" {
 
-		err = tiff.Encode(buf, goimg, nil)
+		err = tiff.Encode(buf, im, nil)
 
 	} else {
+
 		msg := fmt.Sprintf("Unsupported content type '%s' for decoding", content_type)
 		err = errors.New(msg)
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return goimg, nil
-}
-
-func GolangImageToGolangImage(im image.Image, source_content_type string, dest_content_type string) (image.Image, error) {
-
-	body, err := GolangImageToBytes(im, source_content_type)
+	body := bytes.NewBuffer(buf.Bytes())
+	goimg, format, err := image.Decode(body)
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	converted, err := BytesToGolangImage(body, dest_content_type)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return converted, nil
+	return goimg, format, nil
 }
 
 func ImageFormatToContentType(format string) (string, error) {

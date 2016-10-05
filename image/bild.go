@@ -163,7 +163,7 @@ func (im *BILDImage) Transform(t *Transformation) error {
 	ri, err := t.RotationInstructions(im)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if ri.Flip {
@@ -199,28 +199,32 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		// this should be trapped above
 	}
 
-	// to do - make this work; currently causes go to panic like crazy
+	// this seems to work (20161005/thisisaaronland)
 
 	fi, err := t.FormatInstructions(im)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	ct, _ := ImageFormatToContentType(fi.Format)
 
 	if ct != im.ContentType() {
 
-		source_content_type := im.ContentType()
-		dest_content_type, _ := ImageFormatToContentType(fi.Format)
-
-		converted, err := GolangImageToGolangImage(im.image, source_content_type, dest_content_type)
+		content_type, err := ImageFormatToContentType(fi.Format)
 
 		if err != nil {
-			return nil
+			return err
+		}
+
+		converted, format, err := GolangImageToGolangImage(im.image, content_type)
+
+		if err != nil {
+			return err
 		}
 
 		im.image = converted
+		im.format = format
 	}
 
 	// to do - custom features...
