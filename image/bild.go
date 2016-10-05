@@ -184,7 +184,9 @@ func (im *BILDImage) Transform(t *Transformation) error {
 	// for bitonal images... (20161004/thisisaaronland)
 
 	if t.Quality == "color" || t.Quality == "default" {
+
 		// do nothing.
+
 	} else if t.Quality == "gray" {
 
 		grey := effect.Grayscale(im.image)
@@ -207,15 +209,13 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		return err
 	}
 
-	ct, _ := ImageFormatToContentType(fi.Format)
+	content_type, err := ImageFormatToContentType(fi.Format)
 
-	if ct != im.ContentType() {
+	if err != nil {
+		return err
+	}
 
-		content_type, err := ImageFormatToContentType(fi.Format)
-
-		if err != nil {
-			return err
-		}
+	if content_type != im.ContentType() {
 
 		converted, format, err := GolangImageToGolangImage(im.image, content_type)
 
