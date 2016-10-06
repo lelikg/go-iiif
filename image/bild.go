@@ -128,7 +128,6 @@ func (im *BILDImage) Transform(t *Transformation) error {
 
 	// http://iiif.io/api/image/2.1/#order-of-implementation
 
-	// to implement: http://localhost:8082/full-300.png/square/full/0/color.png
 	// too thin: http://localhost:8082/full-300.png/125,15,120,140/full/0/color.png
 	// too cropped: http://localhost:8082/full-300.png/pct:41.6,7.5,66.6,100/full/0/color.png
 

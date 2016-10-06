@@ -174,21 +174,22 @@ func (t *Transformation) RegionInstructions(im Image) (*RegionInstruction, error
 		var x int
 		var y int
 
-		if width < height {
-			y = (height - width) / 2.
-			x = width
-		} else {
-			x = (width - height) / 2.
-			y = height
-		}
+		min := math.Min(float64(width), float64(height))
 
-		y = x
+		if width > height {
+			x = (width - height) / 2.
+			y = 0
+
+		} else {
+			x = 0
+			y = (height - width) / 2.
+		}
 
 		instruction := RegionInstruction{
 			X:      x,
 			Y:      y,
-			Width:  width,
-			Height: height,
+			Width:  int(min),
+			Height: int(min),
 		}
 
 		return &instruction, nil
