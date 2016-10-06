@@ -297,16 +297,25 @@ func (t *Transformation) RegionInstructions(im Image) (*RegionInstruction, error
 			return nil, err
 		}
 
-		w := int(math.Ceil(float64(width) * pw / 100.))
-		h := int(math.Ceil(float64(height) * ph / 100.))
-		x := int(math.Ceil(float64(width) * px / 100.))
-		y := int(math.Ceil(float64(height) * py / 100.))
+		x := int(math.Ceil((float64(width) * px) / 100.))
+		y := int(math.Ceil((float64(height) * py) / 100.))
+
+		w := int(math.Ceil((float64(width) * pw) / 100.))
+		h := int(math.Ceil((float64(height) * ph) / 100.))
 
 		instruction := RegionInstruction{
 			Width:  w,
 			Height: h,
 			X:      x,
 			Y:      y,
+		}
+
+		if instruction.X+instruction.Width > width {
+			instruction.Width = width - instruction.X
+		}
+
+		if instruction.Y+instruction.Height > height {
+			instruction.Height = height - instruction.Y
 		}
 
 		return &instruction, nil
