@@ -1,5 +1,9 @@
 package image
 
+// package all custom (go-iiif) quality transformations here so that they can be shared
+// by the various engine-specific packages (vips, bild, etc.) – doesn't work yet
+// (20161202/thisisaaronland)
+
 import (
        "errors"
        "strconv"
