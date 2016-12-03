@@ -2,12 +2,15 @@ package aws
 
 import (
 	"bytes"
+	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	_ "log"
+	"os/user"
 	"path/filepath"
+	"strings"
 )
 
 type S3Connection struct {
@@ -17,10 +20,10 @@ type S3Connection struct {
 }
 
 type S3Config struct {
-     Bucket string
-     Prefix string
-     Region string
-     Credentials string
+	Bucket      string
+	Prefix      string
+	Region      string
+	Credentials string // see notes below
 }
 
 func NewS3Connection(s3cfg S3Config) (*S3Connection, error) {
@@ -28,15 +31,66 @@ func NewS3Connection(s3cfg S3Config) (*S3Connection, error) {
 	// https://docs.aws.amazon.com/sdk-for-go/v1/developerguide/configuring-sdk.html
 	// https://docs.aws.amazon.com/sdk-for-go/api/service/s3/
 
-	sess := session.New(&aws.Config{
-		Region:      aws.String(s3cfg.Region),
-		Credentials: credentials.NewSharedCredentials("", s3cfg.Credentials),
-	})
+	cfg := aws.NewConfig()
+	cfg.WithRegion(s3cfg.Region)
 
-	_, err := sess.Config.Credentials.Get()
+	if strings.HasPrefix(s3cfg.Credentials, "env:") {
 
-	if err != nil {
-		return nil, err
+		creds := credentials.NewEnvCredentials()
+		cfg.WithCredentials(creds)
+
+	} else if strings.HasPrefix(s3cfg.Credentials, "shared:") {
+
+		details := strings.Split(s3cfg.Credentials, ":")
+
+		if len(details) != 3 {
+			return nil, errors.New("Shared credentials need to be defined as 'shared:CREDENTIALS_FILE:PROFILE_NAME'")
+		}
+
+		creds := credentials.NewSharedCredentials(details[1], details[2])
+		cfg.WithCredentials(creds)
+
+	} else if strings.HasPrefix(s3cfg.Credentials, "iam:") {
+
+		// assume an IAM role suffient for doing whatever
+
+	} else if s3cfg.Credentials != "" {
+
+		// for backwards compatibility as of 05a6042dc5956c13513bdc5ab4969877013f795c
+		// (20161203/thisisaaronland)
+
+		whoami, err := user.Current()
+
+		if err != nil {
+			return nil, err
+		}
+
+		dotaws := filepath.Join(whoami.HomeDir, ".aws")
+		creds_file := filepath.Join(dotaws, "credentials")
+
+		profile := s3cfg.Credentials
+
+		creds := credentials.NewSharedCredentials(creds_file, profile)
+		cfg.WithCredentials(creds)
+
+	} else {
+
+		// for backwards compatibility as of 05a6042dc5956c13513bdc5ab4969877013f795c
+		// (20161203/thisisaaronland)
+
+		creds := credentials.NewEnvCredentials()
+		cfg.WithCredentials(creds)
+	}
+
+	sess := session.New(cfg)
+
+	if s3cfg.Credentials != "" {
+
+		_, err := sess.Config.Credentials.Get()
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	service := s3.New(sess)
@@ -50,7 +104,7 @@ func NewS3Connection(s3cfg S3Config) (*S3Connection, error) {
 	return &c, nil
 }
 
-func (conn *S3Connection) Head(key string) (*s3.HeadObjectOutput, error){
+func (conn *S3Connection) Head(key string) (*s3.HeadObjectOutput, error) {
 
 	key = conn.prepareKey(key)
 

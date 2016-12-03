@@ -5,6 +5,8 @@ import (
 	iiifcache "github.com/thisisaaronland/go-iiif/cache"
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	iiifsource "github.com/thisisaaronland/go-iiif/source"
+	_ "log"
+	"os"
 )
 
 type Image interface {
@@ -74,6 +76,24 @@ func NewImageFromConfig(config *iiifconfig.Config, id string) (Image, error) {
 func NewImageFromConfigWithSource(config *iiifconfig.Config, source iiifsource.Source, id string) (Image, error) {
 
 	if config.Graphics.Source.Name == "VIPS" {
+
+		/*
+			http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/VipsImage.html#vips-image-new-temp-file
+		*/
+
+		if config.Graphics.Source.Tmpdir != "" {
+
+			tmpdir := config.Graphics.Source.Tmpdir
+
+			_, err := os.Stat(tmpdir)
+
+			if os.IsNotExist(err) {
+				return nil, err
+			}
+
+			os.Setenv("TMPDIR", tmpdir)
+		}
+
 		return NewVIPSImageFromConfigWithSource(config, source, id)
 	} else if config.Graphics.Source.Name == "BILD" {
 		return NewBILDImageFromConfigWithSource(config, source, id)

@@ -51,6 +51,7 @@ vendor-deps: deps
 
 fmt:
 	go fmt *.go
+	go fmt aws/*.go
 	go fmt cache/*.go
 	go fmt cmd/*.go
 	go fmt compliance/*.go
