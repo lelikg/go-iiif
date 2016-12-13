@@ -6,11 +6,18 @@ package image
 
 import (
        "errors"
+	iiifconfig "github.com/thisisaaronland/go-iiif/config"
        "strconv"
        "strings"       
 )
 
-func Foo (im Image, t *Transformation) (error) { 
+func Foo (im Image, t *Transformation, config *iiifconfig.Config) (error) { 
+
+	fi, err := t.FormatInstructions(im)
+
+	if err != nil {
+		return nil
+	}
 
 	if t.Quality == "dither" {
 
@@ -37,7 +44,7 @@ func Foo (im Image, t *Transformation) (error) {
 			return err
 		}
 
-		max_iters := im.config.Primitive.MaxIterations
+		max_iters := config.Primitive.MaxIterations
 
 		if max_iters > 0 && iters > max_iters {
 			return errors.New("Invalid primitive iterations")
@@ -73,9 +80,11 @@ func Foo (im Image, t *Transformation) (error) {
 			return err
 		}
 
+		/*
 		if fi.Format == "gif" {
 			im.isgif = true
 		}
+		*/
 	}
 
 	return nil
