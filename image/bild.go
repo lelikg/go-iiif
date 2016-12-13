@@ -64,6 +64,7 @@ func NewBILDImageFromConfigWithSource(config *iiifconfig.Config, src iiifsource.
 		source_id: id,
 		image:     img,
 		format:    format,
+		config:    config,
 	}
 
 	return &bim, nil
@@ -230,7 +231,7 @@ func (im *BILDImage) Transform(t *Transformation) error {
 	_, err = CustomTransform(im, t, im.config)
 
 	if err != nil {
-	   return err
+		return err
 	}
 
 	return nil

@@ -292,7 +292,7 @@ func (im *VIPSImage) Transform(t *Transformation) error {
 	rsp, err := CustomTransform(im, t, im.config)
 
 	if err != nil {
-	   return err
+		return err
 	}
 
 	// see notes in NewVIPSImageFromConfigWithSource

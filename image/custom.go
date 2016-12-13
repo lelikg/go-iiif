@@ -1,24 +1,24 @@
 package image
 
 // package all custom (go-iiif) quality transformations here so that they can be shared
-// by the various engine-specific packages (vips, bild, etc.) – doesn't work yet
-// (20161202/thisisaaronland)
+// by the various engine-specific packages (vips, bild, etc.)
 
 import (
-       "errors"
+	"errors"
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
-       "strconv"
-       "strings"       
+	_ "log"
+	"strconv"
+	"strings"
 )
 
 type CustomResponse struct {
-     IsGIF bool
+	IsGIF bool
 }
 
-func CustomTransform (im Image, t *Transformation, config *iiifconfig.Config) (*CustomResponse, error) { 
+func CustomTransform(im Image, t *Transformation, config *iiifconfig.Config) (*CustomResponse, error) {
 
 	rsp := CustomResponse{
-	    IsGIF: false,
+		IsGIF: false,
 	}
 
 	fi, err := t.FormatInstructions(im)
