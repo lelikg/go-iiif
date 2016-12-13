@@ -11,12 +11,20 @@ import (
        "strings"       
 )
 
-func Foo (im Image, t *Transformation, config *iiifconfig.Config) (error) { 
+type CustomResponse struct {
+     IsGIF bool
+}
+
+func CustomTransform (im Image, t *Transformation, config *iiifconfig.Config) (*CustomResponse, error) { 
+
+	rsp := CustomResponse{
+	    IsGIF: false,
+	}
 
 	fi, err := t.FormatInstructions(im)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	if t.Quality == "dither" {
@@ -24,7 +32,7 @@ func Foo (im Image, t *Transformation, config *iiifconfig.Config) (error) {
 		err := DitherImage(im)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 	} else if strings.HasPrefix(t.Quality, "primitive:") {
@@ -35,29 +43,31 @@ func Foo (im Image, t *Transformation, config *iiifconfig.Config) (error) {
 		mode, err := strconv.Atoi(parts[0])
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		iters, err := strconv.Atoi(parts[1])
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		max_iters := config.Primitive.MaxIterations
 
 		if max_iters > 0 && iters > max_iters {
-			return errors.New("Invalid primitive iterations")
+			err = errors.New("Invalid primitive iterations")
+			return nil, err
 		}
 
 		alpha, err := strconv.Atoi(parts[2])
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if alpha > 255 {
-			return errors.New("Invalid primitive alpha")
+			err = errors.New("Invalid primitive alpha")
+			return nil, err
 		}
 
 		animated := false
@@ -77,15 +87,13 @@ func Foo (im Image, t *Transformation, config *iiifconfig.Config) (error) {
 		err = PrimitiveImage(im, opts)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		/*
 		if fi.Format == "gif" {
-			im.isgif = true
+			rsp.IsGIF = true
 		}
-		*/
 	}
 
-	return nil
+	return &rsp, nil
 }

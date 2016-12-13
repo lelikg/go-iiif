@@ -227,7 +227,11 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.format = format
 	}
 
-	// to do - custom features...
+	_, err = CustomTransform(im, t, im.config)
+
+	if err != nil {
+	   return err
+	}
 
 	return nil
 }
