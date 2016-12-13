@@ -305,8 +305,6 @@ func (im *VIPSImage) Transform(t *Transformation) error {
 			return err
 		}
 
-		im.isgif = true
-
 		err = GolangImageToIIIFImage(goimg, im)
 
 		if err != nil {

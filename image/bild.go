@@ -11,6 +11,7 @@ import (
 	iiifconfig "github.com/thisisaaronland/go-iiif/config"
 	iiifsource "github.com/thisisaaronland/go-iiif/source"
 	"image"
+	_ "image/gif"
 	_ "log"
 )
 
@@ -73,7 +74,24 @@ func NewBILDImageFromConfigWithSource(config *iiifconfig.Config, src iiifsource.
 func (im *BILDImage) Update(body []byte) error {
 
 	buf := bytes.NewBuffer(body)
+
 	img, format, err := image.Decode(buf)
+
+	/*
+
+		TO DO: ALLOW body TO BE DECODED AS AN ANIMATED GIF
+		github.com/thisisaaronland/go-iiif/image
+
+		src/github.com/thisisaaronland/go-iiif/image/bild.go:87: cannot use img (type *gif.GIF) as type image.Image in assignment:
+								 *gif.GIF does not implement image.Image (missing At method)
+		src/github.com/thisisaaronland/go-iiif/image/bild.go:88: undefined: format
+
+		gifs, err := gif.DecodeAll(buf)
+
+		img := gifs.Image	// returns an image.Paletted
+		format := "gif"
+
+	*/
 
 	if err != nil {
 		return err
@@ -228,6 +246,7 @@ func (im *BILDImage) Transform(t *Transformation) error {
 		im.format = format
 	}
 
+	// rsp, err := CustomTransform(im, t, im.config)
 	_, err = CustomTransform(im, t, im.config)
 
 	if err != nil {
