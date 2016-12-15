@@ -435,13 +435,15 @@ func (im *VIPSImage) Crop(tr *Transformation) (Image, error) {
 		opts.Top = -1
 	}
 
+	// This isn't doing what we want which is to return an new smaller
+	// version of the image without also modifying the source image without
+	// first having to clone the source image...
+
 	body, err := im.bimg.Process(opts)
 
-	if err != nil {
-		return nil, err
-	}
+	// body, err := im.bimg.Extract(opts.Top, opts.Left, opts.Width, opts.Height)
 
-	bimg := bimg.NewImage(body)
+	b := bimg.NewImage(body)
 
 	crop := VIPSImage{
 		config:    im.config,
@@ -449,7 +451,7 @@ func (im *VIPSImage) Crop(tr *Transformation) (Image, error) {
 		source_id: im.source_id,
 		id:        im.id,
 		isgif:     im.isgif,
-		bimg:      bimg,
+		bimg:      b,
 	}
 
 	return &crop, nil

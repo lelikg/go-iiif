@@ -9,14 +9,10 @@ import (
 	iiifimage "github.com/thisisaaronland/go-iiif/image"
 	iiiflevel "github.com/thisisaaronland/go-iiif/level"
 	iiifprofile "github.com/thisisaaronland/go-iiif/profile"
-	// iiifsource "github.com/thisisaaronland/go-iiif/source"
-	_ "log"
+	"log"
 	"math"
-	_ "path/filepath"
 	"runtime"
-	_ "strings"
 	"sync"
-	_ "time"
 )
 
 type TileSeed struct {
@@ -158,14 +154,37 @@ func (ts *TileSeed) SeedTiles(src_id string, alt_id string, scales []int, refres
 
 				// https://github.com/thisisaaronland/go-iiif/issues/33
 
-				crop, _ := image.Crop(tr)
+				id, _ := im.Dimensions()
+
+				log.Println("URI", uri)
+				log.Println("IM", id)
+
+				crop, err := image.Crop(tr)
+
+				// please fix me... this should never happen
+
+				if err != nil {
+					log.Println("URI", uri)
+					log.Println("TR", tr)
+					log.Println("ERR", err)
+					return
+				}
+
+				id, _ = im.Dimensions()
+				cd, _ := crop.Dimensions()
+
+				log.Println("IM", id)
+				log.Println("CROP", cd)
 
 				tr.Region = "full"
 				err = crop.Transform(tr)
 
-				if err == nil {
-					ts.derivatives_cache.Set(uri, crop.Body())
+				if err != nil {
+					log.Println("FAILED TO TRANSFORM", err)
+					return
 				}
+
+				ts.derivatives_cache.Set(uri, crop.Body())
 
 			}(throttle, image, transformation, wg)
 		}
