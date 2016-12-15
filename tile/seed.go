@@ -140,7 +140,7 @@ func (ts *TileSeed) SeedTiles(src_id string, alt_id string, scales []int, refres
 
 		for _, transformation := range crops {
 
-			<- throttle
+			<-throttle
 
 			wg.Add(1)
 
@@ -164,7 +164,11 @@ func (ts *TileSeed) SeedTiles(src_id string, alt_id string, scales []int, refres
 
 				// to do (maybe?) - https://github.com/thisisaaronland/go-iiif/issues/33
 
-				tmp, _ := iiifimage.NewImageFromConfigWithSource(ts.config, source, im.Identifier())
+				tmp, _ := iiifimage.NewCropFromConfigWithSource(ts.config, source, im.Identifier(), tr)
+				tr.Region = "full"
+				err = tmp.Transform(tr)
+
+				// tmp, _ := iiifimage.NewImageFromConfigWithSource(ts.config, source, im.Identifier())
 
 				err = tmp.Transform(tr)
 

@@ -13,6 +13,7 @@ type Image interface {
 	Identifier() string
 	Rename(string) error
 	Transform(*Transformation) error // http://iiif.io/api/image/2.1/#order-of-implementation
+	Crop(*Transformation) error      // work in progress... we'll see...
 	Update([]byte) error
 	Body() []byte
 	Format() string
@@ -98,4 +99,21 @@ func NewImageFromConfigWithSource(config *iiifconfig.Config, source iiifsource.S
 	}
 
 	return nil, errors.New("Unknown graphics source")
+}
+
+func NewCropFromConfigWithSource(config *iiifconfig.Config, source iiifsource.Source, id string, tr *Transformation) (Image, error) {
+
+	im, err := NewImageFromConfigWithSource(config, source, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = im.Crop(tr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return im, nil
 }

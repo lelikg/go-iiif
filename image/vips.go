@@ -408,3 +408,36 @@ func (im *VIPSImage) Transform(t *Transformation) error {
 
 	return nil
 }
+
+func (im *VIPSImage) Crop(tr *Transformation) error {
+
+	rgi, err := tr.RegionInstructions(im)
+
+	if err != nil {
+		return err
+	}
+
+	opts := bimg.Options{
+		AreaWidth:  rgi.Width,
+		AreaHeight: rgi.Height,
+		Left:       rgi.X,
+		Top:        rgi.Y,
+	}
+
+	if im.ContentType() == "image/svg+xml" {
+		opts.Type = bimg.PNG
+
+	}
+
+	if opts.Top == 0 && opts.Left == 0 {
+		opts.Top = -1
+	}
+
+	_, err = im.bimg.Process(opts)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
