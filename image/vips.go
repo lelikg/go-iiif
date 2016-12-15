@@ -409,12 +409,14 @@ func (im *VIPSImage) Transform(t *Transformation) error {
 	return nil
 }
 
-func (im *VIPSImage) Crop(tr *Transformation) error {
+// https://github.com/thisisaaronland/go-iiif/issues/33
+
+func (im *VIPSImage) Crop(tr *Transformation) (Image, error) {
 
 	rgi, err := tr.RegionInstructions(im)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	opts := bimg.Options{
@@ -433,11 +435,22 @@ func (im *VIPSImage) Crop(tr *Transformation) error {
 		opts.Top = -1
 	}
 
-	_, err = im.bimg.Process(opts)
+	body, err := im.bimg.Process(opts)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	bimg := bimg.NewImage(body)
+
+	crop := VIPSImage{
+		config:    im.config,
+		source:    im.source,
+		source_id: im.source_id,
+		id:        im.id,
+		isgif:     im.isgif,
+		bimg:      bimg,
+	}
+
+	return &crop, nil
 }

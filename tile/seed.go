@@ -9,7 +9,7 @@ import (
 	iiifimage "github.com/thisisaaronland/go-iiif/image"
 	iiiflevel "github.com/thisisaaronland/go-iiif/level"
 	iiifprofile "github.com/thisisaaronland/go-iiif/profile"
-	iiifsource "github.com/thisisaaronland/go-iiif/source"
+	// iiifsource "github.com/thisisaaronland/go-iiif/source"
 	_ "log"
 	"math"
 	_ "path/filepath"
@@ -115,12 +115,6 @@ func (ts *TileSeed) SeedTiles(src_id string, alt_id string, scales []int, refres
 		}
 	}
 
-	source, err := iiifsource.NewMemorySource(image.Body())
-
-	if err != nil {
-		return count, err
-	}
-
 	throttle := make(chan bool, ts.procs)
 
 	for i := 0; i < ts.procs; i++ {
@@ -162,18 +156,15 @@ func (ts *TileSeed) SeedTiles(src_id string, alt_id string, scales []int, refres
 					}
 				}
 
-				// to do (maybe?) - https://github.com/thisisaaronland/go-iiif/issues/33
+				// https://github.com/thisisaaronland/go-iiif/issues/33
 
-				tmp, _ := iiifimage.NewCropFromConfigWithSource(ts.config, source, im.Identifier(), tr)
+				crop, _ := image.Crop(tr)
+
 				tr.Region = "full"
-				err = tmp.Transform(tr)
-
-				// tmp, _ := iiifimage.NewImageFromConfigWithSource(ts.config, source, im.Identifier())
-
-				err = tmp.Transform(tr)
+				err = crop.Transform(tr)
 
 				if err == nil {
-					ts.derivatives_cache.Set(uri, tmp.Body())
+					ts.derivatives_cache.Set(uri, crop.Body())
 				}
 
 			}(throttle, image, transformation, wg)
