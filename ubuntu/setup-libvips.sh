@@ -8,7 +8,7 @@ VERSION=`cat /etc/os-release | grep VERSION_ID | awk -F '=' '{ print $2 }'`
 # appear to still be memory/pointer release errors (20161001/thisisaaronland)
 
 VIPS_MAJOR='8.4'
-VIPS_VERSION='8.4.2'
+VIPS_VERSION='8.4.5'
 
 # See this: At the moment it seems easier and more reliable to install from
 # source. One day it will all install from apt... (20160930/thisisaaronland)

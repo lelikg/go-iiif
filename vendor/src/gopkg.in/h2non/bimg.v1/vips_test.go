@@ -29,15 +29,32 @@ func TestVipsRead(t *testing.T) {
 }
 
 func TestVipsSave(t *testing.T) {
-	image, _, _ := vipsRead(readImage("test.jpg"))
-	options := vipsSaveOptions{Quality: 95, Type: JPEG, Interlace: true}
+	types := [...]ImageType{JPEG, PNG, WEBP}
 
-	buf, err := vipsSave(image, options)
-	if err != nil {
-		t.Fatal("Cannot save the image")
+	for _, typ := range types {
+		image, _, _ := vipsRead(readImage("test.jpg"))
+		options := vipsSaveOptions{Quality: 95, Type: typ}
+
+		buf, err := vipsSave(image, options)
+		if err != nil {
+			t.Fatalf("Cannot save the image as '%v'", ImageTypes[typ])
+		}
+		if len(buf) == 0 {
+			t.Fatalf("Empty saved '%v' image", ImageTypes[typ])
+		}
 	}
+}
+
+func TestVipsSaveTiff(t *testing.T) {
+	if !IsTypeSupportedSave(TIFF) {
+		t.Skipf("Format %#v is not supported", ImageTypes[TIFF])
+	}
+	image, _, _ := vipsRead(readImage("test.jpg"))
+	options := vipsSaveOptions{Quality: 95, Type: TIFF}
+	buf, _ := vipsSave(image, options)
+
 	if len(buf) == 0 {
-		t.Fatal("Empty image")
+		t.Fatalf("Empty saved '%v' image", ImageTypes[TIFF])
 	}
 }
 
@@ -97,9 +114,9 @@ func TestVipsWatermark(t *testing.T) {
 		t.Errorf("Cannot add watermark: %s", err)
 	}
 
-	buf, _ := vipsSave(newImg, vipsSaveOptions{Quality: 95})
-	if len(buf) == 0 {
-		t.Fatal("Empty image")
+	buf, err := vipsSave(newImg, vipsSaveOptions{Quality: 95})
+	if len(buf) == 0 || err != nil {
+		t.Fatalf("Empty image. %#v", err)
 	}
 }
 
