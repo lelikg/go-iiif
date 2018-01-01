@@ -175,7 +175,7 @@ func ExampleHandler(root string) (http.HandlerFunc, error) {
 	return http.HandlerFunc(f), nil
 }
 
-func HealthHandlerFunc(root string) (http.HandlerFunc, error) {
+func HealthHandlerFunc() (http.HandlerFunc, error) {
 	f := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "OK")
 	}
@@ -477,7 +477,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	HealthHandler, err := HealthHandlerFunc(config)
+	HealthHandler, err := HealthHandlerFunc()
 
 	ImageHandler, err := ImageHandlerFunc(config, images_cache, derivatives_cache)
 
