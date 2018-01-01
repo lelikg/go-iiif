@@ -175,6 +175,14 @@ func ExampleHandler(root string) (http.HandlerFunc, error) {
 	return http.HandlerFunc(f), nil
 }
 
+func HealthHandlerFunc(root string) (http.HandlerFunc, error) {
+	f := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "OK")
+	}
+
+	return http.HandlerFunc(f), nil
+}
+
 func ExpvarHandlerFunc(host string) (http.HandlerFunc, error) {
 
 	f := func(w http.ResponseWriter, r *http.Request) {
@@ -469,6 +477,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	HealthHandler, err := HealthHandlerFunc(config)
+
 	ImageHandler, err := ImageHandlerFunc(config, images_cache, derivatives_cache)
 
 	if err != nil {
@@ -479,6 +489,7 @@ func main() {
 
 	// https://github.com/thisisaaronland/go-iiif/issues/4
 
+	router.HandleFunc("/status", HealthHandler)
 	router.HandleFunc("/{identifier:.+}/info.json", InfoHandler)
 	router.HandleFunc("/{identifier:.+}/{region}/{size}/{rotation}/{quality}.{format}", ImageHandler)
 
